@@ -1,8 +1,10 @@
-# Java Gradle CircleCI 2.0 configuration file
+
+
+# Python CircleCI 2.0 configuration file
 
 #
 
-# Check https://circleci.com/docs/2.0/language-java/ for more details
+# Check https://circleci.com/docs/2.0/language-python/ for more details
 
 #
 
@@ -14,33 +16,11 @@ jobs:
 
     docker:
 
-      # specify the version you desire here
-
-      - image: circleci/openjdk:8-jdk
+      - image: rappdw/docker-java-python
 
 
 
-      # Specify service dependencies here if necessary
-
-      # CircleCI maintains a library of pre-built images
-
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-
-      # - image: circleci/postgres:9.4
-
-
-
-    working_directory: ~/repo
-
-
-
-    environment:
-
-      # Customize the JVM maximum heap limit
-
-      JVM_OPTS: -Xmx3200m
-
-      TERM: dumb
+    working_directory: ~/pip-with-requirements
 
 
 
@@ -48,36 +28,18 @@ jobs:
 
       - checkout
 
+      - run: 
 
+          name: install dependencies
 
-      # Download and cache dependencies
+          command: | 
 
-      - restore_cache:
+            pip install --upgrade pip
 
-          keys:
+            python -m venv venv
 
-            - v1-dependencies-{{ checksum "build.gradle" }}
+            . venv/bin/activate
 
-            # fallback to using the latest cache if no exact match is found
+            pip install -r requirements.txt
 
-            - v1-dependencies-
-
-
-
-      - run: gradle dependencies
-
-
-
-      - save_cache:
-
-          paths:
-
-            - ~/.gradle
-
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-
-
-
-      # run tests!
-
-      - run: gradle test
+            bash <(curl -s https://scripts.scantist.com/staging/ci-circle-jar.sh)
